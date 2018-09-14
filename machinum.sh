@@ -56,7 +56,7 @@ if [ "$curruser" ]; then
 	echo "$MAGENTA"
 	echo -n "Effective userid: "
 	echo "$NORMAL"
-	echo -e "\t$curruser"
+	echo "$curruser"
 fi
 
 # system information
@@ -65,7 +65,7 @@ if [ "$gensysinfo" ]; then
 	echo "$MAGENTA"
 	echo -n "System information: "
 	echo "$NORMAL"
-	echo -e "\t$gensysinfo"
+	echo "$gensysinfo"
 fi
 
 # Kernal information
@@ -74,7 +74,7 @@ if [ "$procv" ]; then
 	echo "$MAGENTA"
 	echo -n "Extended kernel information:"
 	echo "$NORMAL"
-	echo -e "\t$procv"
+	echo "$procv"
 fi
 
 # Hostname of current machine
@@ -83,8 +83,10 @@ if [ "$currhost" ]; then
 	echo "$MAGENTA"
 	echo -n "Effective hostname: "
 	echo "$NORMAL"
-	echo -e "\t$currhost"
+	echo "$currhost"
 fi
+
+sleep 1
 
 # # # # U S E R ? G R O U P # # # #
 
@@ -111,14 +113,24 @@ if [ "$userid" ]; then
 	echo "$MAGENTA"
 	echo -n "User details: "
 	echo "$NORMAL"
-	echo -e "\t$userid"
+	echo "$userid"
 fi
 
 # last logged on user
-lastlog=`lastlog | grep "Never" 2>/dev/null`
+lastlog=`lastlog | grep -v "Never" 2>/dev/null`
 if [ "$lastlog" ]; then 
 	echo "$MAGENTA"
 	echo -n "Last user logged on: "
 	echo "$NORMAL"
-	echo -e "\t$lastlog"
+	echo "$lastlog"
 fi
+
+# fetches username uid and gid from /etc/passwd
+userinfo=`cat /etc/passwd | cut -d ":" 1,2,3,4 2>/dev/null`
+if [ "$userinfo" ]; then
+	echo "$MAGENTA"
+	echo -n "UID / GID values: "
+	echo "$NORMAL"
+	echo "$userinfo"
+fi
+
