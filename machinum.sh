@@ -38,15 +38,15 @@ date
 echo "$BLUE"
 echo -n "<>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<>"
 echo "$GREEN"
-echo -n "#"
+echo -n "##"
 echo -n "$NORMAL"
-echo -n "~~~~~~~~~~~~~~~"
+echo -n "~~~~~~~~~~~~~~"
 echo -n "$GREEN"
 echo -n " SYSTEM "
 echo -n "$NORMAL"
-echo -n "~~~~~~~~~~~~~~~"
+echo -n "~~~~~~~~~~~~~~"
 echo -n "$GREEN"
-echo "#"
+echo "##"
 echo -n "$BLUE"
 echo    "<>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<>"
 
@@ -57,6 +57,15 @@ if [ "$curruser" ]; then
 	echo -n "Effective userid: "
 	echo "$NORMAL"
 	echo "$curruser"
+fi
+
+# Hostname of current machine
+currhost=`hostname 2>/dev/null`
+if [ "$currhost" ]; then
+        echo "$MAGENTA"
+        echo -n "Effective hostname: "
+        echo "$NORMAL"
+        echo "$currhost"
 fi
 
 # system information
@@ -77,15 +86,6 @@ if [ "$procv" ]; then
 	echo "$procv"
 fi
 
-# Hostname of current machine
-currhost=`hostname 2>/dev/null`
-if [ "$currhost" ]; then
-	echo "$MAGENTA"
-	echo -n "Effective hostname: "
-	echo "$NORMAL"
-	echo "$currhost"
-fi
-
 sleep 1
 
 # # # # U S E R ? G R O U P # # # #
@@ -94,15 +94,15 @@ echo
 echo "$BLUE"
 echo -n "<>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<>"
 echo "$GREEN"
-echo -n "#"
+echo -n "##"
 echo -n "$NORMAL"
-echo -n "~~~~~~~~~~~~~~~"
+echo -n "~~~~~~~~~~~~~~"
 echo -n "$GREEN"
 echo -n " USER/GROUP "
 echo -n "$NORMAL"
-echo -n "~~~~~~~~~~~~~~~"
+echo -n "~~~~~~~~~~~~~~"
 echo -n "$GREEN"
-echo "#"
+echo "##"
 echo -n "$BLUE"
 echo    "<>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<>"
 
@@ -111,14 +111,14 @@ echo    "<>~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~<>"
 userid=`id 2>/dev/null`
 if [ "$userid" ]; then
 	echo "$MAGENTA"
-	echo -n "User details: "
+	echo -n "Current User details: "
 	echo "$NORMAL"
 	echo "$userid"
 fi
 
 # last logged on user
 lastlog=`lastlog | grep -v "Never" 2>/dev/null`
-if [ "$lastlog" ]; then 
+if [ "$lastlog" ]; then
 	echo "$MAGENTA"
 	echo -n "Last user logged on: "
 	echo "$NORMAL"
@@ -126,7 +126,7 @@ if [ "$lastlog" ]; then
 fi
 
 # fetches username uid and gid from /etc/passwd
-userinfo=`cat /etc/passwd | cut -d ":" 1,2,3,4 2>/dev/null`
+userinfo=`cat /etc/passwd | cut -d ":" -f 1,2,3,4 2>/dev/null`
 if [ "$userinfo" ]; then
 	echo "$MAGENTA"
 	echo -n "UID / GID values: "
@@ -134,3 +134,29 @@ if [ "$userinfo" ]; then
 	echo "$userinfo"
 fi
 
+# ids and respective groups
+usergrpinfo=`for i in $(cat /etc/passwd 2>/dev/null| cut -d ":" -f1 2>/dev/null);do id $i;done 2>/dev/null`
+if [ "$usergrpinfo" ]; then
+	echo "$MAGENTA"
+	echo -n "User's groups: "
+	echo "$NORMAL"
+	echo "$usergrpinfo"
+fi
+
+# password hashes in /etc/passwd?
+hashespwdf=`grep -v '^[^:]*:[x]' /etc/passwd 2>/dev/null`
+if [ "$hashespwdf" ]; then
+	echo "$GREEN"
+	echo -n "Password hashes found in \'/etc/passwd\'"
+	echo "$NORMAL"
+	echo "$hashespwdf"
+fi
+
+# can we see the /etc/shadow file?
+shadow=`cat /etc/shadow 2>/dev/null`
+if [ "$shadow" ]; then
+	echo "$GREEN"
+	echo -n "\'/etc/shadow\' file can be read!"
+	echo "$NORMAL"
+	echo "$shadow"
+fi
